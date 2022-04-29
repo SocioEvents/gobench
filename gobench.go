@@ -176,7 +176,7 @@ func NewConfiguration() *Configuration {
 		urls:       make([]string, 0),
 		method:     "GET",
 		postData:   nil,
-		sseHeader:  nil,
+		sseHeader:  sseHeader,
 		keepAlive:  keepAlive,
 		requests:   int64((1 << 63) - 1),
 		authHeader: authHeader}
