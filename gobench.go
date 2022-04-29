@@ -29,6 +29,7 @@ var (
 	postDataFilePath string
 	writeTimeout     int
 	readTimeout      int
+	sseHeader		 string
 	authHeader       string
 )
 
@@ -39,6 +40,7 @@ type Configuration struct {
 	requests   int64
 	period     int64
 	keepAlive  bool
+	sseHeader  string
 	authHeader string
 
 	myClient fasthttp.Client
@@ -89,6 +91,7 @@ func init() {
 	flag.IntVar(&writeTimeout, "tw", 5000, "Write timeout (in milliseconds)")
 	flag.IntVar(&readTimeout, "tr", 5000, "Read timeout (in milliseconds)")
 	flag.StringVar(&authHeader, "auth", "", "Authorization header")
+	flag.StringVar(&sseHeader, "H", "", "SSE header")
 }
 
 func printResults(results map[int]*Result, startTime time.Time) {
@@ -173,6 +176,7 @@ func NewConfiguration() *Configuration {
 		urls:       make([]string, 0),
 		method:     "GET",
 		postData:   nil,
+		sseHeader:  nil,
 		keepAlive:  keepAlive,
 		requests:   int64((1 << 63) - 1),
 		authHeader: authHeader}
@@ -265,6 +269,10 @@ func client(configuration *Configuration, result *Result, done *sync.WaitGroup) 
 				req.Header.Set("Connection", "close")
 			}
 
+			if len(configuration.sseHeader) > 0 {
+				req.Header.Set("Accept", "text/event-stream")
+			}
+			
 			if len(configuration.authHeader) > 0 {
 				req.Header.Set("Authorization", configuration.authHeader)
 			}
